@@ -1,0 +1,1368 @@
+<!DOCTYPE HTML>
+<html lang="pl">
+	<head>
+		<title>Smart home</title>
+		<meta charset="UTF-8">
+	
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" href="main.css" />
+		<!--<link rel="stylesheet" href="font-awesome/css/all.css">-->
+		<link rel="icon" href="icon.png">
+
+		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.13.0/css/all.css">
+		
+		
+		<!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>-->
+		
+
+
+</head>
+<body onload="loadAnimations()">
+
+		
+
+	<!-- 
+		START content
+	-->
+	<div id="content">
+		<div id="inner">
+
+			<div id="main_view" class="active">
+				<div id="navigation_top">
+					<!-- 
+						START date content
+					-->
+					<div id="date">
+						<div id="hours"></div>
+						<div id="seconds"></div>
+						<div id="day"></div>
+					</div>
+					<!-- 
+						END date content
+					-->
+	
+					<h2 id="page_title">Leds management</h2>
+				</div>
+
+			
+				<!-- 
+					START top panel
+				-->
+				<div id="top_panel">
+					<!-- Color picker with different options -->
+					<div id="colorPickerBg">
+						<div id="colorPicker"> 
+							<div id="selectedColor"></div>
+
+							<input tabindex="-1" type="text" id="colorPickedHue" class="input_inside_picker" maxlength="3" value="255" onfocusout="updateColorPicker('hue')">
+							<input tabindex="-1" type="text" id="colorPickedSaturation" class="input_inside_picker" maxlength="3" value="255" onfocusout="updateColorPicker('saturation')">
+							<input tabindex="-1" type="text" id="colorPickedValue" class="input_inside_picker" maxlength="3" value="255" onfocusout="updateColorPicker('value')">
+						</div>
+					</div>
+					
+					<div id="colorPickerOptions">
+						<div class="input_option">
+							<input tabindex="1" type="text" id="colorPickedHex" class="input_text input_color" maxlength="8" placeholder="#fff" onfocusout="updateColorPicker('hex')"/>
+
+							<!--
+								TOOLTIP - Information about corectness of data
+							-->
+							<div class="tooltip">
+								<i class="copy far fa-copy" onclick="showToolTip(0, 'Copied!', 1)"></i>
+								<span class="tooltip_text">Copied!</span>
+							</div>
+						</div>
+						
+						<div class="input_option">
+							<input tabindex="2" type="text" id="colorPickedRgb" class="input_text input_color" onfocusout="updateColorPicker('rgb')"/>
+
+							<!--
+								TOOLTIP - Information about corectness of data
+							-->
+							<div class="tooltip">
+								<i class="copy far fa-copy" onclick="showToolTip(1, 'Copied!', 1)"></i>
+								<span class="tooltip_text">Copied!</span>
+							</div>
+						</div>
+
+						<div class="input_option">
+							<input tabindex="3" type="text" id="colorPickedHsl" class="input_text input_color" onfocusout="updateColorPicker('hsl')"/>
+							
+							<!--
+								TOOLTIP - Information about corectness of data
+							-->
+							<div class="tooltip">
+								<i class="copy far fa-copy" onclick="showToolTip(2, 'Copied!', 1)"></i>
+								<span class="tooltip_text">Copied!</span>
+							</div>
+						</div>
+					</div>
+					
+					<!-- Confirming selected options to leds -->
+					<div id="applyButton" onclick="sendColorPickerData()"> Send <i class="fas fa-angle-double-right temporary"></i></div>
+				</div>
+				<!-- 
+					END top panel
+				-->
+						
+						
+						
+				<!-- 
+					START bottom panel
+				-->	
+				<div id="bottom_panel">
+					<div class="left">
+						<div class="slidecontainer">
+							<h3>Red</h3>
+							<input type="text" id="red_input" class="slider_input" maxlength="3" onfocusout="updateSlider(0, 'red')"/>
+							
+							<input tabindex="-1" type="range" id="red_slider" min="0" max="255" class="slider"/>				
+						</div>
+						
+						<div class="slidecontainer">
+							<h3>Green</h3>
+							<input type="text" id="green_input" class="slider_input" maxlength="3" onfocusout="updateSlider(1, 'green')"/>
+							
+							<input tabindex="-1" type="range" id="green_slider" min="0" max="255" class="slider"/>						
+						</div>
+						
+						<div class="slidecontainer">
+							<h3>Blue</h3>
+							<input type="text" id="blue_input" class="slider_input" maxlength="3" onfocusout="updateSlider(2, 'blue')"/>
+							
+							<input tabindex="-1" type="range" id="blue_slider" min="0" max="255" class="slider"/>					
+						</div>
+					</div>
+
+
+					<div class="right">
+						<div class="slidecontainer">
+							<h2>Brightness</h2>
+							<input type="text" id="brightness_input" class="slider_input" maxlength="3" value="80" onfocusout="updateSlider(3, 'brightness')"/>
+							
+							<input tabindex="-1" type="range" id="brightness_slider" min="1" max="255" value="80" class="slider"/>
+														
+						</div>
+
+
+						<div class="slidecontainer" style="height: 140px;">
+							<h2>Power saving mode</h2>
+
+							<input tabindex="-1" type="range" id="power_slider" min="1" max="3" value="2" class="slider" onchange="updatePowerSlider()"/>
+							<p id="power_saving_mode">Regular efficiency</p>			
+						</div>
+					</div>
+				</div>
+				<!-- 
+					END bottom panel
+				-->	
+			</div>
+
+
+			<div id="colors_view">
+				<div id="colors_view_title" class="sticky_title">
+					<h1>Predefined colors</h1>
+					<p>Most commonly used colors</p>
+					<div class="line"></div>
+				</div>
+
+				<i id="colors_view_close" class="fas fa-times"></i>
+
+				<div id="favourite_colors_container">
+
+				</div>
+			</div>
+			
+			
+			<div id="right_panel">
+				<div id="effects">
+					<div id="effects_title" class="sticky_title">
+						<i id="colors_view_open" class="fas fa-angle-double-right"></i>
+
+						<h1>Animations</h1>
+						<p>Our customized styles</p>
+						<div class="line"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+	<!-- 
+		END content
+	-->	
+
+
+
+	<div id="navigation_bottom">
+		<ul id="nav">
+			<li id="openSecondPage" class="bottom_menu_button" onclick="openNav(0, 'colors_view')"><i class="fas fa-palette"></i></li>
+			<li id="openFirstPage" class="bottom_menu_button active" onclick="openNav(1, 'main_view')"><i class="fas fa-sliders-h"></i></li>
+			<li id="openThirdPage" class="bottom_menu_button" onclick="openNav(2, 'right_panel')"><i class="fas fa-gamepad"></i></li>
+		</ul>
+	</div>
+
+	
+	
+	<div id="popup_info">
+        <h1 id="popup_title"></h1>
+        
+        <i id="popup_close" class="fas fa-times"></i>
+    </div>
+
+	<script src="iro.js"></script>
+
+
+
+	
+	<script>
+
+		/**
+		 * 
+		 *             --[ START ]--
+		 * loadAnimations() function description
+		 *  
+		 * - Inserts different animations to elements in certain order and delays
+		 * - Starts the local clock 
+		 * - Loads whole colors_view container
+		 * 
+		 */
+		function loadAnimations() {
+			playAnimation(document.getElementById("date"),              'slideInFromLeftDate',   0, "visible", true);   //insert animation to date in navigation_top
+			playAnimation(document.getElementById("page_title"),        'slideInFromRightTitle', 0, "visible", true);   //insert animation to page_title in navigation_top
+
+			playAnimation(document.getElementById("top_panel"),         'slideInFromTop',        0, "visible", true);   //insert animation to top_panel in content
+			playAnimation(document.getElementById("bottom_panel"),      'slideInFromBottom',     0, "visible", true);   //insert animation to bottom_panel in content
+
+			playAnimation(document.getElementById("colors_view_title"), 'slideInFromTop',        0, "visible", true);   //insert animation to colors_view_title in colors_view
+
+			constructRightPanel();
+			setTimeout(rightPanelAnimation, 300);   //delay right_panel effects animation
+
+			// Fix content scroll bar after all animations are loaded
+			setTimeout( function() {
+				document.getElementById("content").style.overflowY = "auto";
+			}, 2000);
+
+			doDate();   //calculate current local time
+			setInterval(doDate, 1000);   //update local time every one second
+
+			loadColors();   //load favourite colors view
+		}
+		
+		
+	
+
+
+		/**
+		 * 
+		 *             --[ START ]--
+		 * rightAnimation() function description
+		 *  
+		 * Runs right_panel animation with specific order and rules
+		 *  1.'animationRepeat' is equal to '-1' -> effects_title is being animated
+		 * 	2.'animationRepeat' is higher than '-1' -> single effect option is animated, 
+		 *     and Timeout is set to run this function recursively
+ 		 * 
+		 */
+		let animationRepeat = -1;
+		const effect_class      = document.getElementsByClassName("effect");
+		const effects_container = document.getElementById("effects");
+
+		function rightPanelAnimation() {
+			let title = document.getElementById("effects_title");
+			
+			if (animationRepeat == -1) {
+				playAnimation(document.getElementById("effects_title"), 'slideInFromTop', 0, "visible", true);   //insert animation to right_panel title
+
+			} else {
+				playAnimation(effect_class[animationRepeat], 'slideInFromRight', 0, "visible", true);   //insert animation to right_panel single effect
+				effect_class[animationRepeat].style.opacity = 1;
+			}
+			
+			animationRepeat++;
+				
+
+			if (animationRepeat < effect_class.length) setTimeout(rightPanelAnimation, 50);
+			if (animationRepeat == effect_class.length) animationRepeat = 0;
+		}
+
+
+
+
+
+		/**
+		 * 
+		 *               --[ START ]--
+		 * constructRightPanel() function description
+		 *  
+		 * Construct right panel effects using the specified effect aray
+ 		 * 
+		 */
+		function constructRightPanel() {
+			let all_animations = [
+				["Pacific ocean", "Pleaseant"], 
+				["Rainbow", "Super pleaseant"], 
+				["Vulcanic eruption", "Pleaseant"],
+				["Catch me if you can", "Medium pleasure"], 
+				["Eyecrusher", "xd"], 
+				["You better don't click", "Super pleaseant"], 
+				["Purple - green", "Pleaseant"], 
+				["Let's see", "Medium pleasure"], 
+				["Rainbow", "Super pleaseant"], 
+				["Not created yet", "hard to say"], 
+				["Not created yet", "hard to say"], 
+				["Not created yet", "hard to say"], 
+				["Not created yet", "hard to say"]
+			];
+
+			/**
+			 * Create new DOM elements and add them to HTML page
+			 * 
+			 * Pattern:
+			 *  <div class="effect" onclick="changeEffect(0)">
+			 * 		<i class="fas fa-power-off"></i>
+			 * 		<div class="effect_desc">
+			 * 			<h2 class="tit">Pacific ocean</h2>
+			 * 			<h3 class="titl">Pleaseant</h3>
+			 * 		</div>
+			 * 	</div>
+			 * 
+			 */
+			for (let i=0; i < all_animations.length; i++) {
+				let effect = document.createElement('div'); 
+				effect.setAttribute("class", "effect");
+				effect.setAttribute("onclick", "changeEffect(" + i + ")");
+
+					let icon = document.createElement('i'); 
+					icon.setAttribute("class", "fas fa-power-off");
+					effect.appendChild(icon); 
+
+					let description = document.createElement('div'); 
+					description.setAttribute("class", "effect_desc");
+
+						let h2 = document.createElement('h2'); 
+						h2.setAttribute("class", "tit");
+						h2.innerHTML = all_animations[i][0];
+						description.appendChild(h2); 
+
+						let h3 = document.createElement('h3'); 
+						h3.setAttribute("class", "titl");
+						h3.innerHTML = all_animations[i][1];
+						description.appendChild(h3); 
+
+					effect.appendChild(description); 
+
+				effects_container.appendChild(effect); 
+			}
+		}
+		
+		
+	
+
+
+		/**
+		 * 
+		 *         --[ START ]--
+		 * doDate() function description
+		 *  
+		 * Function responsible for creating a human-redeable
+		 * local time format visible in top navigation
+		 * 
+		 */
+		let hours_div   = document.getElementById("hours");
+		let seconds_div = document.getElementById("seconds");
+		let day_div     = document.getElementById("day");
+
+		function doDate() {
+			let now = new Date();
+			
+			let hours   = now.getHours();
+			let minutes = now.getMinutes();
+			let seconds = now.getSeconds();
+			
+			let day   = now.getDate();
+			let month = now.getMonth();
+			let year  = now.getFullYear();
+			
+			if (hours   < 10) hours   = "0" + now.getHours();
+			if (minutes < 10) minutes = "0" + now.getMinutes();
+			if (seconds < 10) seconds = "0" + now.getSeconds();
+			
+			if (day < 10) day = "0" + now.getDate();
+			
+			let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+		
+			hours_div.innerHTML   = hours + ":" + minutes;
+			seconds_div.innerHTML = ":" + seconds;
+			day_div.innerHTML     = day + " " + months[month] + " " + year;
+		}
+		
+		
+	
+
+
+		/**
+		 * 
+		 *              --[ START ]--
+		 * requestWithParameters() function description
+		 *  
+		 * Sends information to led's receiver 
+		 *
+		 */
+		function requestWithParameters(parameters) {
+
+			let xhr = new XMLHttpRequest();
+			xhr.open("POST", "/ledstate", true);
+			
+			xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+			xhr.onreadystatechange = function() {
+			
+				if (this.readyState == 4 && this.status == 200) {
+					//document.getElementById("info").innerHTML = xhr.responseText;
+					showPopup('Success!', 1);
+				} else {
+					showPopup("Couldn't connect to LED's WiFI module!", 0);
+				}
+			
+			};
+			
+			xhr.send(parameters);
+		}
+
+
+
+
+
+		/**
+		 * 
+		 * 		         --[ START ]--
+		 * sendColorPickerData() function description
+		 * 
+		 * Gets current colors configuration and sends it forward
+		 * 
+		 */
+		function sendColorPickerData() {
+			let hue = colorHue.value;
+			let sat = colorSaturation.value;
+			let bri = colorValue.value;
+			
+			requestWithParameters("Hue=" + hue + "&Sat=" + sat + "&Bri=" + bri);
+		}
+
+
+
+
+
+		/**
+		 * 
+		 * 		      --[ START ]--
+		 * changeEffect() function description
+		 * 
+		 * Chooses effect which should be active right 
+		 * now and sends data to leds
+		 * 
+		 * Parameters:
+		 *  index -> [Integer] Identification number for effect
+		 * 
+		 */
+		function changeEffect(index) {
+			let x = document.getElementsByClassName("effect");
+			for (let i = 0; i < x.length; i++) {
+				x[i].className = x[i].className.replace(" active", "");
+			}
+
+			x[index].classList.add("active");
+			requestWithParameters("EffectID=" + index);
+		}
+
+
+
+
+
+		/**
+		 * 
+		 * Listening for window scroll to update 
+		 * efects title style
+		 * 
+		 */
+		document.getElementById('effects').addEventListener('scroll', function(){ 
+			scrollpos = document.getElementById('effects').scrollTop;
+
+			if (scrollpos > 0)document.getElementById('effects_title').classList.add('active');
+			else document.getElementById('effects_title').classList.remove('active');
+		});
+		
+
+
+
+
+		/**
+		 * 
+		 * 		      --[ START ]--
+		 * updateSlider() function description
+		 * 
+		 * Updates slider and its input os user slide or when
+		 * user types in hard written value
+		 * 
+		 * Parameters:
+		 *  index -> [Integer] Identification number for modified slider
+		 * 	type  -> [String] Represents function of the slider 
+		 * 
+		 */
+		const sliderInput = document.getElementsByClassName("slider_input");
+		const slider      = document.getElementsByClassName("slider");
+
+		const redSlider   = document.getElementById("red_slider");
+		const greenSlider = document.getElementById("green_slider");
+		const blueSlider  = document.getElementById("blue_slider");
+
+		const redInput   = document.getElementById("red_input");
+		const greenInput = document.getElementById("green_input");
+		const blueInput  = document.getElementById("blue_input");
+		
+		function updateSlider(index, type) {
+			let val = sliderInput[index].value;
+			if (val == "" || isNaN(val) || val < 0 || val > 255) val = 80;
+
+			sliderInput[index].value = val;
+			slider[index].value = val;
+			
+			if (type == "brightness") requestWithParameters("Brightness=" + val);
+			if (type == "red" || type == "green" || type == "blue") updateColorPicker('singleColor');
+		}
+
+
+
+
+
+		/**
+		 * 
+		 * 		        --[ START ]--
+		 * updatePowerSlider() function description
+		 * 
+		 * Updates energy slider responsible for energy saving mode 
+		 * 
+		 * Parameters:
+		 *  x -> [Integer] Identification number for modified slider
+		 * 
+		 */
+		function updatePowerSlider(x) {
+			let power_info = document.getElementById("power_saving_mode")
+			
+			if (x <= 1) power_info.innerHTML = "Low efficiency";
+			if (x == 2) power_info.innerHTML = "Regular efficiency";
+			if (x >= 3) power_info.innerHTML = "High efficiency";
+		}
+
+
+
+
+
+		/**
+		 * 
+		 * Listening for slider input change and 
+		 * chaning text input value 
+		 * 
+		 */
+		redSlider.oninput = function() {
+			redInput.value = this.value;
+			updateSlider(0, "red");
+		}
+		
+		greenSlider.oninput = function() {
+			greenInput.value = this.value;
+			updateSlider(1, "green");
+		}
+		
+		blueSlider.oninput = function() {
+			blueInput.value = this.value;
+			updateSlider(2, "blue");
+		}
+		
+		slider[3].oninput = function() {
+			sliderInput[3].value = this.value;
+			updateSlider(3, "brightness");
+		}
+
+		slider[4].oninput = function() {
+			updatePowerSlider(this.value);
+		}
+
+
+
+
+
+		/**
+		 * 
+		 *       --[ START ]--
+		 * openNav() function description
+		 *  
+		 * Opens different navs through navigation menu [used on smaller devices]
+		 * 
+		 * Parameters:
+		 *  index   -> [Integer] Identification number of navigation menu
+		 *  element -> [Object] Element which is going to be animated
+		 * 
+		 */
+		let defaultNav      = 1;   //view opened by default
+		let openedNav       = defaultNav;   //currently opened view (same as default)
+		let openedNavName   = 'main_view';
+		let duringAnimation = false;
+		const menu_buttons  = document.getElementsByClassName("bottom_menu_button");
+
+		function openNav(index, element) {
+			button = menu_buttons[index];
+
+			if (duringAnimation) return;
+			let temporaryIndex = index;
+
+
+			//code working for all devices with width smaller or equal to 480px
+			if (window.innerWidth <= 480) {
+				//return if user clicks currently opened view
+				if (index == openedNav) return;
+
+				//style clicked button
+				for (let i=0; i < menu_buttons.length; i++) {
+					menu_buttons[i].classList.remove("active");
+				}
+				duringAnimation = true;
+				button.classList.add("active");
+
+				//If clicked element is on the left of currently active navigation menu - use left slide animation
+				if (index < openedNav) {
+					playAnimation(document.getElementById(openedNavName), 'slideLeft1', 360, "active", false);    //close currently opened menu
+					playAnimation(document.getElementById(element), 'slideLeft2', 360, "active", true);           //open clicked navigation menu
+
+				//Otherways - use right slide animation
+				} else {
+					playAnimation(document.getElementById(openedNavName), 'slideRight1', 360, "active", false);    //close currently opened menu
+					playAnimation(document.getElementById(element), 'slideRight2', 360, "active", true);           //open clicked navigation menu
+				}
+
+				//fix overflow with addition of height_regulation class
+				if (openedNavName == "main_view") document.getElementById(openedNavName).classList.add("height_regulation");
+				if (element == "main_view")       document.getElementById(element).classList.add("height_regulation");
+
+
+
+			//code working for all devices wider than 480px
+			} else {
+
+				//style clicked button
+				for (let i=0; i < menu_buttons.length; i++) {
+					menu_buttons[i].classList.remove("active");
+				}
+				duringAnimation = true;
+
+
+
+				//check if user clicked the default view:
+				if (index == defaultNav) {
+					button.classList.add("active");
+					duringAnimation = false;
+
+					//if currently active view isn't the default one, then close it and make only default visible
+					if (openedNav != defaultNav) playAnimation(document.getElementById(openedNavName), 'slideViewToRight', 760, "active", false);    //close opened menu
+				
+				
+				//Otherways
+				} else {
+
+					//check if user clicked currently opened navigation menu - if yes
+					//then close it and stay with opened main window
+					if (index == openedNav) {
+						playAnimation(document.getElementById(element), 'slideViewToRight', 760, "active", false)
+						menu_buttons[defaultNav].classList.add("active");
+						temporaryIndex = 1;
+					} 
+					
+					
+					//check if user clicked other navigation menu than the active one
+					//- if yes then open other menu above the main one
+					if (index != openedNav) {
+						button.classList.add("active");
+						playAnimation(document.getElementById(element), 'slideViewFromRight', 760, "active", true)
+						if (openedNav != defaultNav) playAnimation(document.getElementById(openedNavName), 'slideViewToRight', 760, "active", false)
+					}
+				}
+			}
+			//update newly opened view
+			openedNav     = temporaryIndex;
+			openedNavName = element;
+		}
+
+
+
+
+
+		/**
+		 * 
+		 * 		        --[ START ]--
+		 * updateColorPicker() function description
+		 * 
+		 * Changes the color picker properties 
+		 * depending on user actions
+		 * 
+		 * Parameters:
+		 *  type -> [String] represents parameter of the slider
+		 * 
+		 */
+		function updateColorPicker(type) {
+			if (type == "hex") {
+				let hex     = colorHex.value;
+				let pattern = /^([0-9A-F]{3}){1,2}$/i;
+				
+				hex = hex.replaceAll("#", "");
+
+				if(pattern.test(hex)) {
+					colorPicker.color.hexString = "#" + hex;
+				} else {
+					colorPicker.color.hexString = "#FFFFFF";
+					colorHex.value = "#FFFFFF";
+				}
+			}
+			
+			if (type == "rgb") {
+				let rgb     = colorRgb.value;
+				let pattern = /^rgb[(](?:\s*0*(?:\d\d?(?:\.\d+)?(?:\s*%)?|\.\d+\s*%|100(?:\.0*)?\s*%|(?:1\d\d|2[0-4]\d|25[0-5])(?:\.\d+)?)\s*(?:,(?![)])|(?=[)]))){3}[)]$/i;
+				
+				if(pattern.test(rgb)) {
+					colorPicker.color.rgbString = rgb;
+				} else {
+					colorPicker.color.rgbString = defaultRgb;
+					colorRgb.value = defaultRgb;
+				}
+			}
+			
+			if (type == "hsl") {
+				let hsl     = colorHsl.value;
+				let pattern = /^hsl[(]\s*0*(?:[12]?\d{1,2}|3(?:[0-5]\d|60))\s*(?:\s*,\s*0*(?:\d\d?(?:\.\d+)?\s*%|\.\d+\s*%|100(?:\.0*)?\s*%)){2}\s*[)]$/i;
+				
+				if(pattern.test(hsl)) {
+					colorPicker.color.hslString = hsl;
+				} else {
+					colorPicker.color.hslString = defaultHsl;
+					colorHsl.value = defaultHsl;
+				}
+			}
+			
+			if (type == "singleColor") {
+				let red   = redSlider.value;
+				let green = greenSlider.value;
+				let blue  = blueSlider.value;
+				
+				if (red   == "" || isNaN(red)   || red   < 0 || red   > 255) red   = 0;
+				if (green == "" || isNaN(green) || green < 0 || green > 255) green = 0;
+				if (blue  == "" || isNaN(blue)  || blue  < 0 || blue  > 255) blue  = 0;
+				
+				colorPicker.color.red   = red;
+				colorPicker.color.green = green;
+				colorPicker.color.blue  = blue;
+			}
+			
+			if (type == "hue") {
+				let hue = colorHue.value;
+				
+				if (hue == "" || isNaN(hue) || hue < 0 || hue > 360) hue = 0;
+				
+				colorPicker.color.hue = hue;
+			}
+			
+			if (type == "saturation") {
+				let saturation = colorSaturation.value;
+				
+				if (saturation == "" || isNaN(saturation) || saturation < 0 || saturation > 100) saturation = 0;
+				
+				colorPicker.color.saturation = saturation;
+			}
+			
+			if (type == "value") {
+				let colorVal = colorValue.value;
+				
+				if (colorVal == "" || isNaN(colorVal) || colorVal < 0 || colorVal > 100) colorVal = 0;
+				
+				colorPicker.color.value = colorVal;
+			}
+		}
+
+
+
+
+
+
+		const defaultHex = "#C7B244";
+		const defaultRgb = "rgb(199, 178, 68)";
+		const defaultHsl = "hsl(50, 54%, 52%)";
+
+		const colorHue        = document.getElementById("colorPickedHue");
+		const colorSaturation = document.getElementById("colorPickedSaturation");
+		const colorValue      = document.getElementById("colorPickedValue");
+
+		const colorHex = document.getElementById("colorPickedHex");
+		const colorRgb = document.getElementById("colorPickedRgb");
+		const colorHsl = document.getElementById("colorPickedHsl");
+
+		const pickedColor = document.getElementById("selectedColor");
+		const pickerBox   = document.getElementById("colorPicker");
+
+
+
+		/**
+		 * 
+		 * Iro.js Color picker constructor
+		 * Creates and inserts object to #colorPicker div
+		 * 
+		 */
+		let colorPicker = new iro.ColorPicker("#colorPicker", {
+			// color picker options
+			// Option guide: https://iro.js.org/guide.html#color-picker-options
+			width: 450,
+			color: defaultHex,
+			borderWidth: 1,
+			borderColor: "#414B57",
+			
+			layout: [
+				{
+					component: iro.ui.Slider,
+					options: {
+					sliderType: 'hue',
+					padding: 1,
+					borderWidth: 2,
+					borderColor: '#3D3D3D',
+					handleRadius: 7,
+					margin: 20,
+					}
+				},
+				{
+					component: iro.ui.Slider,
+					options: {
+					sliderType: 'saturation',
+					padding: 1,
+					borderWidth: 2,
+					borderColor: '#3D3D3D',
+					handleRadius: 7,
+					}
+				},
+				{
+					component: iro.ui.Slider,
+					options: {
+					sliderType: 'value',
+					padding: 1,
+					borderWidth: 2,
+					borderColor: '#3D3D3D',
+					handleRadius: 7,
+					}
+				},
+			]
+		});
+
+
+
+
+
+
+		/**
+		 * 
+		 * Iro.js Color picker, color change event
+		 * Listening for color change 
+		 * 
+		 */
+
+		colorPicker.on(["color:init", "color:change"], function(color){
+			// Show the current color in different formats inside color picker
+			colorHue.value        = parseInt(color.hue);
+			colorSaturation.value = parseInt(color.saturation);
+			colorValue.value      = parseInt(color.value);
+			
+			// Show the current color in different formats below color picker
+			colorHex.value = color.hexString.toUpperCase();
+			colorRgb.value = color.rgbString;
+			colorHsl.value = color.hslString;
+			
+			
+			// Update sliders based on active color
+			redSlider.value   = color.red;
+			greenSlider.value = color.green;
+			blueSlider.value  = color.blue;
+			
+			// Update slider's inputs based on active color
+			redInput.value   = color.red;
+			greenInput.value = color.green;
+			blueInput.value  = color.blue;
+			
+			
+			// Style the color picker container
+			color.alpha = 0.2;   //container background transparency
+			pickedColor.style.backgroundColor = color.hexString.toUpperCase();
+			pickerBox.style.borderColor       = color.hexString.toUpperCase();
+			pickerBox.style.backgroundColor   = color.rgbaString;
+			
+			resizeColorPicker();   //resize color picker in case of different device width
+
+		});
+
+
+
+
+
+		/**
+		 * 
+		 * 		       --[ START ]--
+		 * resizeColorPicker() function description
+		 * 
+		 * Resizes the color picker to make it responsive 
+		 * to actual device width
+		 * 
+		 */
+		 function resizeColorPicker() {
+			if (window.innerWidth <= 900) {
+				let panel_width = top_panel.offsetWidth;    //get width of top_panel (that's where color picker is located in)
+				let new_width = parseInt(panel_width*0.55);
+				if (window.innerWidth <= 850) new_width = parseInt(panel_width*0.51);
+				if (window.innerWidth <= 768) new_width = parseInt(panel_width*0.57);
+				if (window.innerWidth <= 660) new_width = parseInt(panel_width*0.49);
+				if (window.innerWidth <= 500) new_width = parseInt(panel_width*0.47);
+				if (window.innerWidth <= 480) new_width = parseInt(panel_width*0.57);
+				if (window.innerWidth <= 380) new_width = parseInt(panel_width*0.50);
+				if (window.innerWidth <= 320) new_width = parseInt(panel_width*0.57);
+				if (window.innerWidth <= 270) new_width = parseInt(panel_width*0.52);
+
+				colorPicker.resize(new_width);   //resizes colors picker
+
+			} else {
+				colorPicker.resize(450);   //resizes colors picker
+			}
+		}
+
+
+
+
+
+		/**
+		 * 
+		 * Listening for window resize to update 
+		 * color picker size
+		 * 
+		 */
+		window.onresize = function() {
+			resizeColorPicker();
+		}
+
+
+
+
+		
+		/**
+		 * 
+		 *     --[ START ]--
+		 * Popup configuration 
+		 * 
+		 */
+			
+		const popup  = document.getElementById('popup_info');
+		let delay  = 0;
+		let text   = "";
+		let status = 0;
+		let timer;
+		
+
+
+
+
+		/**
+		 * 
+		 *           --[ START ]--
+		 * showPopup() function description
+		 * 
+		 * Parameters:
+		 *  text   -> [String] Information displayed to user
+		 *  status -> [Boolean] True = positive, False = negative (mostly to format colors)
+		 * 
+		 */
+		function showPopup(text1, status1) {
+			delay  = 3;
+			text   = text1;
+			status = status1;
+
+			popup.classList.add("active");
+
+			if (status1) document.getElementById("popup_title").innerHTML = "<i class='icon fas fa-check'></i>" + text1;
+			else document.getElementById("popup_title").innerHTML = "<i class='icon fas fa-exclamation-triangle'></i>" + text1;
+
+			clearTimeout(timer);
+			conf(); // close popup after 5 seconds
+		}
+
+
+
+
+
+		/**
+		 * 
+		 *        --[ START ]--
+		 * conf() function description
+		 * 
+		 * If popup is being displayed - update current text
+		 * else - create popup with choosen style
+		 * 
+		 */
+		function conf() {
+			delay--;
+				
+			if (delay < 0) {
+				clearTimeout(timer);
+				timer = null;
+				return;
+			}
+			
+			if (delay == 0) popup.classList.remove("active");
+			timer = setTimeout("conf()", 1000);
+		}
+		
+
+
+
+
+		/**
+		 * 
+		 * Listening for popup close [X]
+		 * and hiding it from user
+		 * 
+		 */
+		const closePopup = document.getElementById("popup_close");
+		closePopup.onclick = function() {
+			delay = 0;
+			document.getElementById('popup_info').style.opacity="0";
+			document.getElementById('popup_info').style.visiblity="hidden";
+		}
+		
+
+
+
+
+		/**
+		 * 
+		 *           --[ START ]--
+		 * showToolTip() function description
+		 * 
+		 * Shows tooltip when a user wants to copy specified
+		 * color format under the color picker
+		 * 
+		 * Parameters:
+		 *  index -> [Integer] Identification number of tooltip
+		 * 	text  -> [String] Message to user
+		 * 
+		 */
+		const tooltip_text = document.getElementsByClassName("tooltip_text")
+
+		function showToolTip(index, text) {
+            let message = tooltip_text[index];
+			let color   = "#ffffff"
+
+            message.innerHTML = text;
+			message.classList.add("active");
+
+
+			if (index == 0) {
+				playAnimation(colorHex, 'copyAnimation', 0, "active", true);
+				color = colorHex.value;
+			}
+			if (index == 1) {
+				playAnimation(colorRgb, 'copyAnimation', 0, "active", true);
+				color = colorRgb.value;
+			}
+			if (index == 2) {
+				playAnimation(colorHsl, 'copyAnimation', 0, "active", true);
+				color = colorHsl.value;
+			}
+
+			copyText(color);   //copy color to clipboard
+			setTimeout(function() { message.classList.remove("active"); }, 500);   //close tooltip after 0.5s
+        }
+		
+
+
+
+
+		/**
+		 * 
+		 *          --[ START ]--
+		 * copyText() function description
+		 * 
+		 * Copies specified text to clipboard
+		 * 
+		 * Parameters:
+		 * 	text -> [String] message to copy
+		 * 
+		 */
+		function copyText(text) {
+			//create custom element
+			let customText = document.createElement("textarea");
+			
+			//create fake text to copy
+			document.body.appendChild(customText);
+			customText.value = text;
+			customText.select();
+			
+			//check if coppied successfully
+			try {
+				let successful = document.execCommand('copy');				
+			} catch (err) {
+				showPopup("Your browser doesn't support copying.", false);
+			}
+			document.body.removeChild(customText);
+		}
+				
+
+
+
+
+		/**
+		 * 
+		 *           --[ START ]--
+		 * playAnimation() function description
+		 *  
+		 * Animates specified element 
+		 * 
+		 * Parameters:
+		 *  element   -> [Object] Element which is going to be animated
+		 *  animation -> [String] Name of the class containing the animation
+		 *  timer     -> [Integer] > 0 if we want to remove class after specified time, 0 if no removal. Timer in [ms]
+		 *  value     -> [String] Name of the class applied to animated element
+		 *  open      -> [Boolean] True if element being shown, False if hidden
+		 * 
+		 */
+		function playAnimation(element, animation, timer, value, open) {
+			if (open ? element.classList.add(value) : element.classList.remove(value)); 
+				
+			element.classList.remove(animation);
+			void element.offsetWidth;
+			element.classList.add(animation);
+
+			if (timer > 0) {
+				duringAnimation = true;
+				setTimeout(function() { 
+					if (open ? element.className = value : element.className = " "); 
+					duringAnimation = false;
+				}, timer);
+			}
+		}
+
+
+
+
+
+		/**
+		 * 
+		 *         --[ START ]--
+		 * loadColors() function description
+		 *  
+		 * Loads favourite colors panel, adds elements to HTML page
+		 * 
+		 */
+		function loadColors() {
+			let best_colors = ['#00D1FF', '#65FF57', '#00E05A', '#37AD00', '#C7008F', '#708200'];
+			let best_array = [];
+
+			//change color format from HEX to RGB
+			for(let i=0; i < best_colors.length; i++) {
+				let rgb = hexToRGB(best_colors[i]);   //change hexadecimal colors into RGB format
+				let c = rgbToHSV(rgb[0], rgb[1], rgb[2]);   //change RGB to HSV format
+				c.unshift(best_colors[i]);   //add HSV color to best_aray
+				best_array.push(c);
+			}
+
+			//sort best_array basing on color hue
+			let sortedArray = best_array.sort(function(a, b) {
+				return parseFloat(a[1]) - parseFloat(b[1]);
+			});
+
+
+			//create new DOM elements and add them to HTML page
+			for(let i=0; i<sortedArray.length; i++) {
+				let element = document.createElement('div'); 
+				element.setAttribute("class", "favourite_color");
+				element.setAttribute("onclick", "chooseFavouriteColor(" + i + ")");
+				element.style.background = sortedArray[i][0];   //change each element background color
+
+				document.getElementById("favourite_colors_container").appendChild(element); 
+			}
+		}
+
+
+
+
+
+		/**
+		 * 
+		 * Listening for colors view close [X]
+		 * and hiding it from user
+		 * 
+		 */
+
+		const colors_view_close = document.getElementById("colors_view_close");
+		const colors_view       = document.getElementById('colors_view');
+		colors_view_close.onclick = function() {
+			colors_view_open.classList.remove("active");
+			colors_view.classList.remove("active")
+		}
+
+
+
+
+
+		/**
+		 * 
+		 * Listening for colors view button click [=]
+		 * and toggling colors_view
+		 * 
+		 */
+		const colors_view_open = document.getElementById("colors_view_open");
+		colors_view_open.onclick = function() {
+			if (colors_view.classList.contains("active")) {
+				colors_view_open.classList.remove("active");
+				colors_view.classList.remove("active")
+			} else {
+				colors_view_open.classList.add("active");
+				colors_view.classList.add("active")
+			}
+		}
+
+
+
+
+
+		/**
+		 * 
+		 *              --[ START ]--
+		 * chooseFavouriteColor() function description
+		 *  
+		 * Chooses one of favourite colors and sends 
+		 * data to leds controller
+		 * 
+		 * Parameters:
+		 *  index -> [Integer] Identification number for effect
+		 * 
+		 */
+		const favourite_colors = document.getElementsByClassName("favourite_color");
+		function chooseFavouriteColor(index) {
+			for (let i=0; i < favourite_colors.length; i++) {
+				favourite_colors[i].classList.remove("active");
+			}
+
+			if (favourite_colors[index].classList.contains("active")) favourite_colors[index].classList.remove("active")
+			else favourite_colors[index].classList.add("active");
+		}
+
+
+
+
+
+		/**
+		 * 
+		 *         --[ START ]--
+		 * hexToRGB() function description
+		 *  
+		 * Change color format from hexadecimal to RGB
+		 * 
+		 * Parameters:
+		 *  hex -> [String] hexadicaml color in format "#ffffff" or "#fff"
+		 * 
+		 */
+		function hexToRGB(hex) {
+			hex = hex.replaceAll("#", "");
+			let r = 0, g = 0, b = 0;
+
+			if (hex.length == 3) {
+				r = hex[0] + hex[0];
+				g = hex[1] + hex[1];
+				b = hex[2] + hex[2];
+
+			} else if (hex.length == 6) {
+				r = hex[0] + hex[1];
+				g = hex[2] + hex[3];
+				b = hex[4] + hex[5];
+
+			} else {
+				return null;
+			}
+			
+			let toReturn = [
+				parseInt(r, 16),   //toReturn[0] - red
+				parseInt(g, 16),   //toReturn[1] - green
+				parseInt(b, 16)    //toReturn[2] - blue
+			];
+			return toReturn;
+		}
+
+
+
+		
+
+		/**
+		 * 
+		 *           --[ START ]--
+		 * rgbToHSV() function description
+		 *  
+		 * Change color format from RGB to HSV
+		 * 
+		 * Parameters:
+		 *  r -> [Inetger] red color value in range [0-255]
+		 *  g -> [Inetger] green color value in range [0-255]
+		 *  b -> [Inetger] blue color value in range [0-255]
+		 * 
+		 */
+		function rgbToHSV(r, g, b) {
+			//R, G, B values are divided by 255 to change the range from [0-255] to [0-1]
+			r = r / 255.0;
+			g = g / 255.0;
+			b = b / 255.0;
+
+			//h, s, v = hue, saturation, value
+			let cmax = Math.max(r, Math.max(g, b));   //maximum of r, g, b
+			let cmin = Math.min(r, Math.min(g, b));   //minimum of r, g, b
+			let diff = cmax - cmin;   // diff of cmax and cmin.
+			var h = -1, s = -1;
+
+			//if cmax and cmax are equal then h = 0
+			if (cmax == cmin)
+				h = 0;
+
+			//if cmax equal r then compute h
+			else if (cmax == r)
+				h = (60 * ((g - b) / diff) + 360) % 360;
+
+			//if cmax equal g then compute h
+			else if (cmax == g)
+				h = (60 * ((b - r) / diff) + 120) % 360;
+
+			//if cmax equal b then compute h
+			else if (cmax == b)
+				h = (60 * ((r - g) / diff) + 240) % 360;
+
+			//if cmax equal zero
+			if (cmax == 0)
+				s = 0;
+			else
+				s = (diff / cmax) * 100;
+
+			var v = cmax * 100;  //compute v
+
+			let toReturn = [
+				h.toFixed(1), //toReturn[0] - hue
+				s,            //toReturn[1] - saturation
+				v             //toReturn[2] - value
+			];
+			return toReturn;
+		}
+		
+	</script>
+
+</body>	
+</html>
+
+
